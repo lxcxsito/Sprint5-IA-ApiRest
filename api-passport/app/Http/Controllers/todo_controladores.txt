@@ -1,0 +1,600 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+
+class AuthController extends Controller
+{
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6'
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => $request->password
+        ]);
+
+        $token = $user->createToken('API Token')->accessToken;
+
+        return response()->json([
+            'user' => $user,
+            'token' => $token
+        ], 201);
+    }
+
+    public function login(Request $request)
+    {
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return response()->json(['message' => 'Credenciales incorrectas'], 401);
+        }
+
+        $user = Auth::user();
+        $token = $user->createToken('API Token')->accessToken;
+
+        return response()->json([
+            'user' => $user,
+            'token' => $token
+        ]);
+    }
+
+    public function user(Request $request)
+    {
+        return response()->json($request->user());
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->token()->revoke();
+
+        return response()->json(['message' => 'Sesión cerrada']);
+    }
+}
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Routing\Controller as BaseController;
+
+class Controller extends BaseController
+{
+    use AuthorizesRequests, ValidatesRequests;
+}
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Game;
+use Illuminate\Http\Request;
+
+class GameController extends Controller
+{
+
+    public function index()
+    {
+        $games = Game::with('category')->get();
+
+        return response()->json($games);
+    }
+
+    public function show($id)
+    {
+        $game = Game::with(['category', 'reviews'])
+                    ->find($id);
+
+        if (!$game) {
+            return response()->json([
+                'message' => 'Juego no encontrado'
+            ], 404);
+        }
+
+        return response()->json($game);
+    }
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string',
+            'description' => 'required|string',
+            'price' => 'required|numeric',
+            'urlImage' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
+        ]);
+
+        $game = Game::create($validated);
+
+        return response()->json($game, 201);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $game = Game::find($id);
+
+        if (!$game) {
+            return response()->json(['message' => 'Game not found'], 404);
+        }
+
+        $validated = $request->validate([
+            'title' => 'sometimes|string',
+            'description' => 'sometimes|string',
+            'price' => 'sometimes|numeric',
+            'urlImage' => 'sometimes|string',
+            'category_id' => 'sometimes|exists:categories,id',
+        ]);
+
+        $game->update($validated);
+
+        return response()->json($game);
+    }
+
+    public function destroy($id)
+{
+    $game = Game::find($id);
+
+    if (!$game) {
+        return response()->json(['message' => 'Juego no encontrado'], 404);
+    }
+
+    // Borra relaciones
+    $game->purchases()->delete();
+    $game->reviews()->delete();
+
+    $game->delete();
+
+    return response()->json(['message' => 'Game deleted successfully'], 200);
+}
+
+    
+}<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Purchase;
+use App\Models\Game;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class PurchaseController extends Controller
+{
+
+    public function index()
+    {
+        $purchases = Purchase::with(['user', 'game'])->get();
+
+        return response()->json($purchases, 200);
+    }
+
+
+    public function store($id)
+    {
+        $user = Auth::user();
+
+        $game = Game::find($id);
+
+        if (!$game) {
+            return response()->json([
+                'message' => 'Game not found'
+            ], 404);
+        }
+
+        $alreadyPurchased = Purchase::where('user_id', $user->id)
+            ->where('game_id', $id)
+            ->exists();
+
+        if ($alreadyPurchased) {
+            return response()->json([
+                'message' => 'You already own this game'
+            ], 400);
+        }
+
+        $purchase = Purchase::create([
+            'user_id' => $user->id,
+            'game_id' => $game->id,
+            'purchase_date' => now()
+        ]);
+
+        return response()->json([
+            'message' => 'Purchase completed successfully',
+            'purchase' => $purchase
+        ], 201);
+    }
+
+    public function myGames()
+    {
+        $user = Auth::user();
+
+        $games = $user->games()
+            ->with('category')
+            ->get();
+
+        return response()->json($games, 200);
+    }
+}
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Game;
+use App\Models\User;
+use App\Models\Purchase;
+use App\Models\Review;
+
+class StatsController extends Controller
+{
+    public function topRatedGames()
+    {
+        $games = Game::withAvg('reviews', 'rating')
+                     ->orderByDesc('reviews_avg_rating')
+                     ->take(10)
+                     ->get();
+
+        return response()->json($games);
+    }
+
+    // Juegos más vendidos
+    public function mostSoldGames()
+    {
+        $games = Game::withCount('purchases')
+                     ->orderByDesc('purchases_count')
+                     ->take(10)
+                     ->get();
+
+        return response()->json($games);
+    }
+
+    // Usuarios que más han comprado
+    public function topBuyers()
+    {
+        $users = User::withCount('games')
+                     ->orderByDesc('games_count')
+                     ->take(10)
+                     ->get();
+
+        return response()->json($users);
+    }
+}<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+
+class AuthController extends Controller
+{
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6'
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => $request->password
+        ]);
+
+        $token = $user->createToken('API Token')->accessToken;
+
+        return response()->json([
+            'user' => $user,
+            'token' => $token
+        ], 201);
+    }
+
+    public function login(Request $request)
+    {
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return response()->json(['message' => 'Credenciales incorrectas'], 401);
+        }
+
+        $user = Auth::user();
+        $token = $user->createToken('API Token')->accessToken;
+
+        return response()->json([
+            'user' => $user,
+            'token' => $token
+        ]);
+    }
+
+    public function user(Request $request)
+    {
+        return response()->json($request->user());
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->token()->revoke();
+
+        return response()->json(['message' => 'Sesión cerrada']);
+    }
+}
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Routing\Controller as BaseController;
+
+class Controller extends BaseController
+{
+    use AuthorizesRequests, ValidatesRequests;
+}
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Game;
+use Illuminate\Http\Request;
+
+class GameController extends Controller
+{
+
+    public function index()
+    {
+        $games = Game::with('category')->get();
+
+        return response()->json($games);
+    }
+
+    public function show($id)
+    {
+        $game = Game::with(['category', 'reviews'])
+                    ->find($id);
+
+        if (!$game) {
+            return response()->json([
+                'message' => 'Juego no encontrado'
+            ], 404);
+        }
+
+        return response()->json($game);
+    }
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string',
+            'description' => 'required|string',
+            'price' => 'required|numeric',
+            'urlImage' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
+        ]);
+
+        $game = Game::create($validated);
+
+        return response()->json($game, 201);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $game = Game::find($id);
+
+        if (!$game) {
+            return response()->json(['message' => 'Game not found'], 404);
+        }
+
+        $validated = $request->validate([
+            'title' => 'sometimes|string',
+            'description' => 'sometimes|string',
+            'price' => 'sometimes|numeric',
+            'urlImage' => 'sometimes|string',
+            'category_id' => 'sometimes|exists:categories,id',
+        ]);
+
+        $game->update($validated);
+
+        return response()->json($game);
+    }
+
+    public function destroy($id)
+{
+    $game = Game::find($id);
+
+    if (!$game) {
+        return response()->json(['message' => 'Juego no encontrado'], 404);
+    }
+
+    // Borra relaciones
+    $game->purchases()->delete();
+    $game->reviews()->delete();
+
+    $game->delete();
+
+    return response()->json(['message' => 'Game deleted successfully'], 200);
+}
+
+    
+}<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Purchase;
+use App\Models\Game;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class PurchaseController extends Controller
+{
+
+    public function index()
+    {
+        $purchases = Purchase::with(['user', 'game'])->get();
+
+        return response()->json($purchases, 200);
+    }
+
+
+    public function store($id)
+    {
+        $user = Auth::user();
+
+        $game = Game::find($id);
+
+        if (!$game) {
+            return response()->json([
+                'message' => 'Game not found'
+            ], 404);
+        }
+
+        $alreadyPurchased = Purchase::where('user_id', $user->id)
+            ->where('game_id', $id)
+            ->exists();
+
+        if ($alreadyPurchased) {
+            return response()->json([
+                'message' => 'You already own this game'
+            ], 400);
+        }
+
+        $purchase = Purchase::create([
+            'user_id' => $user->id,
+            'game_id' => $game->id,
+            'purchase_date' => now()
+        ]);
+
+        return response()->json([
+            'message' => 'Purchase completed successfully',
+            'purchase' => $purchase
+        ], 201);
+    }
+
+    public function myGames()
+    {
+        $user = Auth::user();
+
+        $games = $user->games()
+            ->with('category')
+            ->get();
+
+        return response()->json($games, 200);
+    }
+}
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Game;
+use App\Models\User;
+use App\Models\Purchase;
+use App\Models\Review;
+
+class StatsController extends Controller
+{
+    public function topRatedGames()
+    {
+        $games = Game::withAvg('reviews', 'rating')
+                     ->orderByDesc('reviews_avg_rating')
+                     ->take(10)
+                     ->get();
+
+        return response()->json($games);
+    }
+
+    // Juegos más vendidos
+    public function mostSoldGames()
+    {
+        $games = Game::withCount('purchases')
+                     ->orderByDesc('purchases_count')
+                     ->take(10)
+                     ->get();
+
+        return response()->json($games);
+    }
+
+    // Usuarios que más han comprado
+    public function topBuyers()
+    {
+        $users = User::withCount('games')
+                     ->orderByDesc('games_count')
+                     ->take(10)
+                     ->get();
+
+        return response()->json($users);
+    }
+}<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+
+class AuthController extends Controller
+{
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6'
+        ]);
+
+        $user = User::create([
+            'name' => $<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+
+class UserController extends Controller
+{
+    public function show($id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'Usuario no encontrado'], 404);
+        }
+
+        return response()->json($user);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'Usuario no encontrado'], 404);
+        }
+
+        $request->validate([
+            'name' => 'sometimes|required|string',
+            'email' => 'sometimes|required|email|unique:users,email,' . $user->id,
+            'password' => 'sometimes|required|min:6'
+        ]);
+
+        if ($request->has('name')) {
+            $user->name = $request->name;
+        }
+
+        if ($request->has('email')) {
+            $user->email = $request->email;
+        }
+
+        if ($request->has('password')) {
+            $user->password = $request->password;
+        }
+
+        $user->save();
+
+        return response()->json($user);
+    }
+}
