@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getGameById } from "../services/games";
+import PurchaseButton from "../components/PurchaseButton";
 
 export default function GameDetail() {
   const { id } = useParams();
@@ -31,6 +32,8 @@ export default function GameDetail() {
       <p>{game.description}</p>
 
       <p>Precio: {game.price} €</p>
+
+      <PurchaseButton gameId={game.id} />
 
       <p>Categoría: {game.category?.name}</p>
     </div>
