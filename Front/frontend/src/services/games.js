@@ -6,6 +6,6 @@ export const getGames = async () => {
 };
 
 export const getGameById = async (id) => {
-  const response = await api.get(`/games/${id}`);
+  const response = await api.get(`http://localhost:8000/api/games/${id}`);
   return response.data;
 };

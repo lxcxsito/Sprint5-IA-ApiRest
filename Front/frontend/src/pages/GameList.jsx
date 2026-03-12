@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getGames } from "../services/games";
 import GameCard from "../components/GameCard";
-
+import "./GameList.css";
 export default function GameList() {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);

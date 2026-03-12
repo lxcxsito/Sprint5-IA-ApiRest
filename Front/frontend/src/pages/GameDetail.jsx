@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getGameById } from "../services/games";
 import PurchaseButton from "../components/PurchaseButton";
-
+import "./GameDetail.css";
 export default function GameDetail() {
   const { id } = useParams();
 
@@ -24,18 +24,15 @@ export default function GameDetail() {
   if (!game) return <p>Cargando...</p>;
 
   return (
-    <div>
-      <h1>{game.title}</h1>
-
-      <img src={game.urlImage} alt={game.title} width="300" />
-
-      <p>{game.description}</p>
-
-      <p>Precio: {game.price} €</p>
-
-      <PurchaseButton gameId={game.id} />
-
-      <p>Categoría: {game.category?.name}</p>
-    </div>
+<div className="game-detail-container">
+  <h1>{game.title}</h1>
+  <img src={game.urlImage} alt={game.title} />
+  <p>{game.description}</p>
+  <p className="price">Precio: {game.price} €</p>
+  <div className="purchase-button">
+    <PurchaseButton gameId={game.id} />
+  </div>
+  <p>Categoría: {game.category?.name}</p>
+</div>
   );
 }
