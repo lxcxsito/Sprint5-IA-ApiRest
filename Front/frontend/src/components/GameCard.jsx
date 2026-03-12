@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-
+import "./GameCard.css";
 export default function GameCard({ game }) {
   return (
     <div className="game-card">
