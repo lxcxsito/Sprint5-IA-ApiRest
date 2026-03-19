@@ -1,0 +1,63 @@
+.stats-container {
+  padding: 40px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.stats-container h1 {
+  text-align: center;
+  color: #9333ea;
+  margin-bottom: 30px;
+  text-shadow: 0 0 10px #9333ea;
+}
+
+/* Lista */
+.stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Card */
+.stats-card {
+  background: #020617;
+  border: 1px solid #1e293b;
+  padding: 20px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.3s;
+}
+
+.stats-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 15px #9333ea;
+}
+
+/* Info izquierda */
+.stats-info {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Título */
+.stats-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #06b6d4;
+}
+
+/* Subinfo */
+.stats-sub {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+/* Valor (derecha) */
+.stats-value {
+  font-size: 20px;
+  font-weight: bold;
+  color: #22c55e;
+  text-shadow: 0 0 8px #22c55e;
+}

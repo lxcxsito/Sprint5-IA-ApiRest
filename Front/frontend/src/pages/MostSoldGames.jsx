@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getMostSoldGames } from "../services/stats";
+import "./Stats.css";
 
 export default function MostSoldGames() {
   const [games, setGames] = useState([]);
@@ -18,15 +19,30 @@ export default function MostSoldGames() {
   }, []);
 
   return (
-    <div>
-      <h1>Juegos más vendidos</h1>
+    <div className="stats-container">
 
-      {games.map((game) => (
-        <div key={game.id}>
-          <h3>{game.title}</h3>
-          <p>Ventas: {game.purchases_count}</p>
-        </div>
-      ))}
+      <h1>🔥 Juegos más vendidos</h1>
+
+      <div className="stats-list">
+
+        {games.map((game, index) => (
+          <div className="stats-card" key={game.id}>
+
+            <div className="stats-info">
+              <span className="stats-title">
+                #{index + 1} {game.title}
+              </span>
+              <span className="stats-sub">Total de ventas</span>
+            </div>
+
+            <span className="stats-value">
+              🛒 {game.purchases_count}
+            </span>
+
+          </div>
+        ))}
+
+      </div>
     </div>
   );
 }

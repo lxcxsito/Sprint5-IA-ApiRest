@@ -26,7 +26,7 @@ export default function GameDetail() {
   return (
 <div className="game-detail-container">
   <h1>{game.title}</h1>
-  <img src={game.urlImage} alt={game.title} />
+  <img src={`/${game.urlImage}`} alt={game.title} />
   <p>{game.description}</p>
   <p className="price">Precio: {game.price} €</p>
   <div className="purchase-button">
