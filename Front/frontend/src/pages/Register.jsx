@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { register } from "../services/auth";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import "./Auth.css";
-export default function Register() {
+
+export default function Register({ setUser }) {
+
   const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,9 +14,15 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await register(name, email, password);
-      navigate("/games"); // redirige al listado de juegos
+
+      const user = await register(name, email, password);
+
+      setUser(user); // 🔥 actualiza navbar
+
+      navigate("/games");
+
     } catch (err) {
       setError(err.response?.data?.message || "Error al registrarse");
     }
@@ -22,7 +31,9 @@ export default function Register() {
   return (
     <div className="auth-container">
       <h2>Register</h2>
+
       <form onSubmit={handleSubmit}>
+
         <input
           type="text"
           name="name"
@@ -31,6 +42,7 @@ export default function Register() {
           onChange={(e) => setName(e.target.value)}
           required
         />
+
         <input
           type="email"
           name="email"
@@ -39,6 +51,7 @@ export default function Register() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
+
         <input
           type="password"
           name="password"
@@ -47,8 +60,11 @@ export default function Register() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+
         {error && <p className="error">{error}</p>}
+
         <button type="submit">Register</button>
+
       </form>
     </div>
   );

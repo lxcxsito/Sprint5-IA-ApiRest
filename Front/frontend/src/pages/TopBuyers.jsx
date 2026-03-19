@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getTopBuyers } from "../services/stats";
+import "./Stats.css";
 
 export default function TopBuyers() {
   const [users, setUsers] = useState([]);
@@ -18,14 +19,30 @@ export default function TopBuyers() {
   }, []);
 
   return (
-    <div>
-      <h1>Usuarios que más compran</h1>
-      {users.map((user) => (
-        <div key={user.id}>
-          <h3>{user.name}</h3>
-          <p>Compras: {user.games_count}</p>
-        </div>
-      ))}
+    <div className="stats-container">
+
+      <h1>🏆 Top compradores</h1>
+
+      <div className="stats-list">
+
+        {users.map((user, index) => (
+          <div className="stats-card" key={user.id}>
+
+            <div className="stats-info">
+              <span className="stats-title">
+                #{index + 1} {user.name}
+              </span>
+              <span className="stats-sub">Total compras</span>
+            </div>
+
+            <span className="stats-value">
+              🎮 {user.games_count}
+            </span>
+
+          </div>
+        ))}
+
+      </div>
     </div>
   );
 }

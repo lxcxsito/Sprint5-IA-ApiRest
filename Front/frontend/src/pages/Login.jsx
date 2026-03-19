@@ -2,7 +2,9 @@ import { useState } from "react";
 import { login } from "../services/auth";
 import { useNavigate } from "react-router-dom";
 import "./Auth.css";
-export default function Login() {
+
+export default function Login({ setUser }) {
+
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -10,9 +12,14 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await login(email, password);
-      navigate("/games"); // redirige al listado de juegos
+      const user = await login(email, password);
+
+      setUser(user); // 🔥 ACTUALIZA EL NAVBAR
+
+      navigate("/games");
+
     } catch (err) {
       setError(err.response?.data?.message || "Error al iniciar sesión");
     }
@@ -21,7 +28,9 @@ export default function Login() {
   return (
     <div className="auth-container">
       <h2>Login</h2>
+
       <form onSubmit={handleSubmit}>
+
         <input
           name="email"
           placeholder="Email"
@@ -29,6 +38,7 @@ export default function Login() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
+
         <input
           type="password"
           name="password"
@@ -37,8 +47,11 @@ export default function Login() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+
         {error && <p className="error">{error}</p>}
+
         <button type="submit">Login</button>
+
       </form>
     </div>
   );
