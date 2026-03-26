@@ -1,0 +1,44 @@
+/* 🔥 SECCIÓN REVIEWS */
+.reviews-section {
+  margin-top: 40px;
+  color: white;
+}
+
+.reviews-section h2 {
+  margin-bottom: 15px;
+  color: #4c6ef5;
+}
+
+/* CARD REVIEW */
+.review-card {
+  background: #1a1a2e;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 12px;
+  border: 1px solid #4c6ef5;
+  transition: 0.2s;
+}
+
+.review-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 12px rgba(76, 110, 245, 0.5);
+}
+
+/* USER */
+.review-card strong {
+  color: #6f86ff;
+  font-size: 16px;
+}
+
+/* RATING */
+.review-card .rating {
+  color: #facc15;
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+/* COMMENT */
+.review-card p {
+  margin: 4px 0;
+  color: #e5e7eb;
+}

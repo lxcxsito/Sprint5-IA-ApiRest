@@ -18,6 +18,8 @@ import Home from './pages/Home';
 import { useEffect } from "react";
 import { getUser } from "./services/auth";
 
+import EditProfile from "./pages/EditProfile";
+
 
 
 function App() {
@@ -66,6 +68,8 @@ function App() {
     
         <Route path="/" element={<Home />} />
 
+        {user && <Route path="/edit-profile" element={<EditProfile user={user} setUser={setUser} />} />}
+        
       </Routes>
 
     </Router>

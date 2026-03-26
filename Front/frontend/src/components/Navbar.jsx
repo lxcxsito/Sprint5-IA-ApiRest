@@ -24,12 +24,12 @@ export default function Navbar({ user, setUser }) {
         {user && (
           <>
             <Link to="/my-games">Mi biblioteca</Link>
-
+            <Link to="/edit-profile">Edit profile</Link>
             {user.role === "admin" && (
               <Link to="/admin/games">Admin</Link>
             )}
-
             <LogoutButton setUser={setUser} />
+
           </>
         )}
 

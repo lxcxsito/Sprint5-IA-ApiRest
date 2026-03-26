@@ -6,6 +6,8 @@ use App\Http\Controllers\GameController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\StatsController;
+use App\Http\Controllers\ReviewController;
+
 
 // Rutas públicas
 Route::post('/register', [AuthController::class, 'register']);
@@ -44,4 +46,15 @@ Route::middleware(['auth:api', 'admin'])->group(function () {
     // Compras
     Route::get('/purchases', [PurchaseController::class, 'index']);
 });
+
+//Reviews
+Route::middleware('auth:api')->group(function () {
+
+    Route::get('/games/{id}/reviews', [ReviewController::class, 'index']);
+
+    Route::post('/games/{id}/reviews', [ReviewController::class, 'store']);
+
+});
+
+
 

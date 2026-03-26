@@ -46,4 +46,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Review::class);
     }
+
+    public function purchases()
+{
+    return $this->hasMany(\App\Models\Purchase::class);
+}
 }

@@ -1,0 +1,43 @@
+/* 🔥 CONTENEDOR FORM */
+.review-form {
+  background: #111827;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #4c6ef5;
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* INPUTS */
+.review-form input {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  background: #1f2937;
+  color: white;
+  font-size: 14px;
+}
+
+.review-form input::placeholder {
+  color: #9ca3af;
+}
+
+/* BOTÓN */
+.review-form button {
+  background: linear-gradient(135deg, #4c6ef5, #6f86ff);
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.review-form button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #4c6ef5;
+}
