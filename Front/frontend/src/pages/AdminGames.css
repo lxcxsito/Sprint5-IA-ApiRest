@@ -1,18 +1,58 @@
 .admin-container {
   padding: 40px;
+  max-width: 800px;
+  margin: auto;
+  color: #e0e0e0;
+  font-family: "Orbitron", sans-serif;
 }
 
-.admin-container h1 {
+.admin-title {
+  font-size: 32px;
   margin-bottom: 20px;
+  text-shadow: 0 0 10px #00eaff;
+}
+
+.admin-subtitle {
+  margin-top: 40px;
+  margin-bottom: 15px;
+  font-size: 24px;
+  text-shadow: 0 0 8px #ff00ff;
 }
 
 .admin-list {
-  margin-top: 30px;
+  margin-top: 20px;
 }
 
-.admin-list div {
+.admin-item {
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid #eee;
-  padding: 10px 0;
+  align-items: center;
+  border-bottom: 1px solid #444;
+  padding: 12px 0;
+  transition: background 0.2s ease;
+}
+
+.admin-item:hover {
+  background: rgba(0, 255, 255, 0.05);
+}
+
+.game-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.delete-btn {
+  background: #ff0044;
+  border: none;
+  padding: 8px 14px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: 0.2s ease;
+}
+
+.delete-btn:hover {
+  background: #ff3366;
+  box-shadow: 0 0 10px #ff0044;
 }

@@ -3,7 +3,14 @@ import "./GameCard.css";
 export default function GameCard({ game }) {
   return (
     <div className="game-card">
-      <img src={game.urlImage} alt={game.title} width="200" />
+      <img
+        src={`/${game.urlImage}`}
+        alt={game.title}
+        onError={(e) => {
+          e.target.src = "/images/games/notfound.jpg";
+        }}
+        width={200}
+      />
 
       <h3>{game.title}</h3>
 

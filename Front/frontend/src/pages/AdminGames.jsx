@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { getGames } from "../services/games";
 import { createGame, deleteGame } from "../services/admin";
 import GameForm from "../components/GameForm";
+import "./AdminGames.css";
 
 export default function AdminGames() {
-
   const [games, setGames] = useState([]);
 
   const loadGames = async () => {
@@ -27,26 +27,27 @@ export default function AdminGames() {
   };
 
   return (
-    <div>
-
-      <h1>Admin - Gestión de juegos</h1>
+    <div className="admin-container">
+      <h1 className="admin-title">🎮 Admin – Gestión de Juegos</h1>
 
       <GameForm onSubmit={handleCreate} />
 
-      <h2>Lista de juegos</h2>
+      <h2 className="admin-subtitle">Lista de juegos</h2>
 
-      {games.map((game) => (
-        <div key={game.id}>
+      <div className="admin-list">
+        {games.map((game) => (
+          <div key={game.id} className="admin-item">
+            <span className="game-title">{game.title}</span>
 
-          <h3>{game.title}</h3>
-
-          <button onClick={() => handleDelete(game.id)}>
-            Borrar
-          </button>
-
-        </div>
-      ))}
-
+            <button
+              className="delete-btn"
+              onClick={() => handleDelete(game.id)}
+            >
+              Borrar
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
