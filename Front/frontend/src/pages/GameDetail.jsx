@@ -69,7 +69,14 @@ export default function GameDetail() {
 
       <h1>{game.title}</h1>
 
-      <img src={`/${game.urlImage}`} alt={game.title} />
+      <img
+        src={`/${game.urlImage}`}
+        alt={game.title}
+        onError={(e) => {
+          e.target.src = "/images/games/notfound.jpg";
+        }}
+      />
+
 
       <p>{game.description}</p>
 
